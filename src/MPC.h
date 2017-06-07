@@ -7,7 +7,17 @@
 using namespace std;
 
 class MPC {
+private:
+  double steer_;
+  double throttle_;
+  const int max_steer_deg_ = 25;
+  const double max_steer_rad_ = max_steer_deg_*(M_PI/180);
+  
+  
  public:
+  vector<double> predicted_path_x_;
+  vector<double> predicted_path_y_;
+  
   MPC();
 
   virtual ~MPC();
@@ -18,6 +28,16 @@ class MPC {
   
   // Transform waypoints from map's coordinate system to car's coordinate system
   void Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px, double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy);
+  
+  /*
+   * Return the value for steering
+   */
+  double ReturnSteerValue();
+  
+  /*
+   * Return the value for throttle
+   */
+  double ReturnThrottleValue();
 };
 
 #endif /* MPC_H */

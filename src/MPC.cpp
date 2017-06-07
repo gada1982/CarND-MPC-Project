@@ -137,3 +137,18 @@ void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<doub
     car_ptsy[i] = -map_x*sin_psi + map_y*cos_psi;
   }
 }
+
+double MPC::ReturnSteerValue() {
+  double steer;
+  
+  // Normalize steering data to [-1, 1]
+  steer = (-1)*steer_ / max_steer_rad_;
+  
+  return steer_;
+  }
+
+double MPC::ReturnThrottleValue() {
+  
+  return throttle_;
+  }
+
