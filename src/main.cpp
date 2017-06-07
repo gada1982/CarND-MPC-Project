@@ -109,12 +109,10 @@ int main() {
           
           Eigen::VectorXd coeffs, car_x, car_y;
           
-          // TODO funkt?
           car_x.resize(car_ptsx.size());
           car_y.resize(car_ptsy.size());
           
-          // TODO funktioniert bzw. nötig?
-          for (int i = 0; i < car_ptsx.size(); i++) {
+          for (size_t i = 0; i < car_ptsx.size(); i++) {
             car_x[i] = car_ptsx[i];
             car_y[i] = car_ptsy[i];
           }
@@ -129,12 +127,12 @@ int main() {
           double car_psi = 0.0;
           double epsi = car_psi -atan(coeffs[1]);
           
-          /*
-           * END: Calculate steering angle and throttle using MPC.
-           *
-           * Both are in between [-1, 1].
-           *
-           */
+          
+           //END: Calculate steering angle and throttle using MPC.
+          
+            //Both are in between [-1, 1].
+          
+          
           double steer_value;
           double throttle_value;
           
@@ -152,7 +150,7 @@ int main() {
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
           msgJson["steering_angle"] = mpc.ReturnSteerValue();
           msgJson["throttle"] = mpc.ReturnThrottleValue();
-
+          
           //Display the MPC predicted trajectory
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line

@@ -9,6 +9,8 @@ using CppAD::AD;
 size_t N = 10;
 double dt = 0.05;
 
+int num_states_in_latency = (int)(0.1 / dt + 0.5);
+
 // This value assumes the model presented in the classroom is used.
 //
 // It was obtained by measuring the radius formed by running the vehicle in the
@@ -141,7 +143,10 @@ class FG_eval {
 //
 // MPC class definition implementation.
 //
-MPC::MPC() {}
+MPC::MPC() {
+  predicted_path_x_.resize(N-1);
+  predicted_path_y_.resize(N-1);
+}
 MPC::~MPC() {}
 
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
@@ -196,9 +201,15 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // The upper and lower limits of delta are set to -max_steer_rad_ and max_steer_rad_
   // degrees (values in radians).
   // (defined in MPC.h)
-  for (int i = delta_start; i < a_start; i++) {
+for (int i = delta_start; i < a_start; i++) {
     vars_lowerbound[i] = -max_steer_rad_;
     vars_upperbound[i] = max_steer_rad_;
+  }
+  
+  // Steering angle is not changed during latency
+  for (int i = delta_start; i < delta_start + num_states_in_latency; i++) {
+    vars_lowerbound[i] = steer_;
+    vars_upperbound[i] = steer_;
   }
   
   // Acceleration/decceleration upper and lower limits.
@@ -206,6 +217,12 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   for (int i = a_start; i < n_vars; i++) {
     vars_lowerbound[i] = -1.0;
     vars_upperbound[i] = 1.0;
+  }
+  
+  // Acceleration/deceleration is not changed during latency
+  for (int i = a_start; i < a_start + num_states_in_latency; i++) {
+    vars_lowerbound[i] = throttle_;
+    vars_upperbound[i] = throttle_;
   }
 
   
@@ -269,12 +286,15 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
 
+  // The first actuator vector after latency is used.
+  steer_ = solution.x[delta_start + num_states_in_latency];
+  throttle_ = solution.x[a_start + num_states_in_latency];
+  
   for (int i = 1; i < N; i++) {
     predicted_path_x_[i-1] = solution.x[x_start + i];
     predicted_path_y_[i-1] = solution.x[y_start + i];
   }
-  
-  // Return the first actuator values. The variables can be accessed with
+   // Return the first actuator values. The variables can be accessed with
   return {solution.x[x_start + 1],   solution.x[y_start + 1],
     solution.x[psi_start + 1], solution.x[v_start + 1],
     solution.x[cte_start + 1], solution.x[epsi_start + 1],
