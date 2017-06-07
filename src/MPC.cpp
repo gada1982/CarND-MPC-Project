@@ -119,3 +119,21 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // creates a 2 element double vector.
   return {};
 }
+
+void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px, double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy) {
+  
+  assert(map_ptsx.size() == map_ptsy.size());
+  
+  car_ptsx.resize(map_ptsx.size());
+  car_ptsy.resize(map_ptsy.size());
+  
+  const double cos_psi = cos(map_psi);
+  const double sin_psi = sin(map_psi);
+  
+  for (int i = 0; i < car_ptsx.size(); i++) {
+    const double map_x = map_ptsx[i] - map_px;
+    const double map_y = map_ptsy[i] - map_py;
+    car_ptsx[i] = map_x*cos_psi + map_y*sin_psi;
+    car_ptsy[i] = -map_x*sin_psi + map_y*cos_psi;
+  }
+}

@@ -85,19 +85,34 @@ int main() {
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          vector<double> ptsx = j[1]["ptsx"];
-          vector<double> ptsy = j[1]["ptsy"];
-          double px = j[1]["x"];
-          double py = j[1]["y"];
-          double psi = j[1]["psi"];
+          vector<double> map_ptsx = j[1]["ptsx"];
+          vector<double> map_ptsy = j[1]["ptsy"];
+          double map_px = j[1]["x"];
+          double map_py = j[1]["y"];
+          double map_psi = j[1]["psi"];
           double v = j[1]["speed"];
 
           /*
-          * TODO: Calculate steering angle and throttle using MPC.
+          * START: Calculate steering angle and throttle using MPC.
           *
           * Both are in between [-1, 1].
           *
           */
+          
+          // Remember that the server returns waypoints using the map's coordinate system, which is different than the car's coordinate system. Transforming these waypoints will make it easier to both display them and to calculate the CTE and Epsi values for the model predictive controller.
+          
+          // Transform waypoints from map's coordinate system to car's coordinate system
+          vector<double> car_ptsx;
+          vector<double> car_ptsy;
+          
+          mpc.Transform_Map_to_Car(map_ptsx, map_ptsy, map_px, map_py, map_psi, car_ptsx, car_ptsy);
+          
+          /*
+           * END: Calculate steering angle and throttle using MPC.
+           *
+           * Both are in between [-1, 1].
+           *
+           */
           double steer_value;
           double throttle_value;
 
