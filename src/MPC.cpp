@@ -9,8 +9,6 @@ using CppAD::AD;
 size_t N = 10;
 double dt = 0.05;
 
-int num_states_in_latency = (int)(0.1 / dt + 0.5);
-
 // This value assumes the model presented in the classroom is used.
 //
 // It was obtained by measuring the radius formed by running the vehicle in the
@@ -206,26 +204,13 @@ for (int i = delta_start; i < a_start; i++) {
     vars_upperbound[i] = max_steer_rad_;
   }
   
-  // Steering angle is not changed during latency
-  for (int i = delta_start; i < delta_start + num_states_in_latency; i++) {
-    vars_lowerbound[i] = steer_;
-    vars_upperbound[i] = steer_;
-  }
-  
   // Acceleration/decceleration upper and lower limits.
   // NOTE: Feel free to change this to something else.
   for (int i = a_start; i < n_vars; i++) {
     vars_lowerbound[i] = -1.0;
     vars_upperbound[i] = 1.0;
   }
-  
-  // Acceleration/deceleration is not changed during latency
-  for (int i = a_start; i < a_start + num_states_in_latency; i++) {
-    vars_lowerbound[i] = throttle_;
-    vars_upperbound[i] = throttle_;
-  }
 
-  
   // Lower and upper limits for the constraints
   // Should be 0 besides initial state.
   Dvector constraints_lowerbound(n_constraints);
@@ -287,8 +272,8 @@ for (int i = delta_start; i < a_start; i++) {
   std::cout << "Cost " << cost << std::endl;
 
   // The first actuator vector after latency is used.
-  steer_ = solution.x[delta_start + num_states_in_latency];
-  throttle_ = solution.x[a_start + num_states_in_latency];
+  steer_ = solution.x[delta_start];
+  throttle_ = solution.x[a_start];
   
   for (int i = 1; i < N; i++) {
     predicted_path_x_[i-1] = solution.x[x_start + i];

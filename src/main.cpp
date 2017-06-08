@@ -118,12 +118,12 @@ int main() {
           }
           coeffs = polyfit(car_x, car_y, 3);
           
-          // Calculate cte ?
+          // Calculate cte
           double car_center_x = 0.0;
           double car_center_y = 0.0;
           double cte = polyeval(coeffs, car_center_x) - car_center_y;
           
-          // Calculate epsi ?
+          // Calculate epsi
           double car_psi = 0.0;
           double epsi = car_psi -atan(coeffs[1]);
           
@@ -144,18 +144,21 @@ int main() {
           // x, y, psi, v, cte, epsi, delta, a
           vector<double> next_state = mpc.Solve(state, coeffs);
           
-          
+          */
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
           // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = mpc.ReturnSteerValue();
-          msgJson["throttle"] = mpc.ReturnThrottleValue();
+          //msgJson["steering_angle"] = mpc.ReturnSteerValue();
+          //msgJson["throttle"] = mpc.ReturnThrottleValue();
+          
+          msgJson["steering_angle"] = 0;
+          msgJson["throttle"] = 0.4;
           
           //Display the MPC predicted trajectory
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
-          msgJson["mpc_x"] = mpc.predicted_path_x_;
-          msgJson["mpc_y"] = mpc.predicted_path_y_;
+          //msgJson["mpc_x"] = mpc.predicted_path_x_;
+          //msgJson["mpc_y"] = mpc.predicted_path_y_;
 
           //Display the waypoints/reference line
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
