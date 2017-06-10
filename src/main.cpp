@@ -121,7 +121,7 @@ int main() {
           // Predict state after latency -> TODO
           double dt = 0.1;
           double car_px = v*dt;
-          double car_psi = -v*steering_angle*dt*0.375;
+          double car_psi = -v*steering_angle*dt/2.67;
           
           double cte = polyeval(coeffs, car_px);
           double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
@@ -159,28 +159,23 @@ int main() {
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle_value;
           
-          //Display the MPC predicted trajectory
-          vector<double> mpc_x;
-          vector<double> mpc_y;
-          
-           for (int i = 1; i < mpc.getN(); i++) {
-             mpc_x.push_back(vars[x_start + i]);
-             mpc_y.push_back(vars[y_start + i]);
-           }
+          // Display the MPC predicted trajectory
+          vector<double> mpc_x_vals;
+          vector<double> mpc_y_vals;
           
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
+          for (int i = 1; i < mpc.getN(); i++) {
+             mpc_x_vals.push_back(vars[x_start + i]);
+             mpc_y_vals.push_back(vars[y_start + i]);
+           }
           
-          msgJson["mpc_x"] = mpc_x;
-          msgJson["mpc_y"] = mpc_y;
+          msgJson["mpc_x"] = mpc_x_vals;
+          msgJson["mpc_y"] = mpc_y_vals;
           
-          //Display the waypoints/reference line
-          vector<double> next_x_vals;// = way_x;
-          vector<double> next_y_vals;// = way_y;
           
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
-          
           msgJson["next_x"] = car_ptsx;
           msgJson["next_y"] = car_ptsy;
           

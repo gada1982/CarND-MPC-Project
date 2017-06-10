@@ -14,7 +14,7 @@
 using CppAD::AD;
 
 // Set the timestep length and duration
-size_t N = 20;
+size_t N = 10;
 double dt = 0.1;
 
 // This value assumes the model presented in the classroom is used.
@@ -31,7 +31,7 @@ const double Lf = 2.67;
 
 // NOTE: feel free to play around with this
 // or do something completely different
-double ref_v = 40.0;
+double ref_v = 50.0;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -64,7 +64,7 @@ public:
     // Include mult-values
     // The part of the cost based on the reference state.
     double mult_ref_cte_epsi = 150.0; // TODO
-    double mult_ref_v = 0.1; // TODO
+    double mult_ref_v = 1.0; // TODO
     for (int t = 0; t < N; t++) {
       fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[cte_start + t], 2);
       fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t], 2);
@@ -191,8 +191,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   
   // Set lower and upper limits for steering angle
   for (int i = delta_start; i < a_start; i++) {
-    vars_lowerbound[i] = -1.0;
-    vars_upperbound[i] = 1.0;
+    vars_lowerbound[i] = -0.436332*Lf;
+    vars_upperbound[i] = 0.436332*Lf;
   }
   
   // Set lower and upper limits for throttle
