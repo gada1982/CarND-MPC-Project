@@ -61,7 +61,6 @@ public:
     // Define the cost related the reference state and
     // any anything you think may be beneficial.
     
-    // Include mult-values
     // The part of the cost based on the reference state.
     double mult_ref_cte_epsi = 150.0; // TODO
     double mult_ref_v = 1.0; // TODO
@@ -71,13 +70,15 @@ public:
       fg[0] += mult_ref_v * CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     
-    // Minimize the use of actuators.
+    // Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
+    double mult_change_rate = 1.0; // TODO
     for (int t = 0; t < N - 1; t++) {
-      fg[0] += CppAD::pow(vars[delta_start + t], 2);
-      fg[0] += CppAD::pow(vars[a_start + t], 2);
+      fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
     }
     
     // Minimize the value gap between sequential actuations.
+    // The next control input should be similar to the current one.
     double mult_gap_actions = 450.0; // TODO
     for (int t = 0; t < N - 2; t++) {
       fg[0] += mult_gap_actions* CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);

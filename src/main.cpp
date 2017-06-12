@@ -99,6 +99,8 @@ int main() {
           double map_py = j[1]["y"];
           double map_psi = j[1]["psi"];
           double v = j[1]["speed"];
+          // Convert from miles/h to m/s
+          //v = v * 0.44704;
           double steering_angle = j[1]["steering_angle"];
           
           vector<double> car_ptsx;
@@ -116,12 +118,14 @@ int main() {
             car_y[i] = car_ptsy[i];
           }
           
+          // TODO: Third-degree polynomials are common since they can fit most roads.
           auto coeffs = polyfit(car_x, car_y, 3);
           
           // Predict state after latency -> TODO
           double dt = 0.1;
           double car_px = v*dt;
-          double car_psi = -v*steering_angle*dt/2.67;
+          const double Lf = 2.67;
+          double car_psi = -v*steering_angle*dt/Lf;
           
           double cte = polyeval(coeffs, car_px);
           double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
@@ -144,11 +148,10 @@ int main() {
           size_t delta_start = idx[6];
           size_t a_start = idx[7];
           
-          double steer_value;
-          double throttle_value;
-          
-          steer_value = -vars[delta_start];
-          throttle_value = vars[a_start];
+          // Normalize steer_value to [-1, 1]
+          //double steer_value = -vars[delta_start] / deg2rad(25);
+          double steer_value = -vars[delta_start];
+          double throttle_value = vars[a_start];
           
           std::cout << "Steering Value: " << steer_value << std::endl;
           std::cout << "Throttle Value: " << throttle_value << std::endl<<std::endl;
