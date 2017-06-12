@@ -30,7 +30,7 @@ const double Lf = 2.67;
 
 // NOTE: feel free to play around with this
 // or do something completely different
-double ref_v = 75.0;
+double ref_v = 70.0;
 
 // The solver takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -61,8 +61,8 @@ public:
     // any anything you think may be beneficial.
     
     // The part of the cost based on the reference state.
-    double mult_ref_cte_epsi = 150.0; // TODO
-    double mult_ref_v = 1.0; // TODO
+    double mult_ref_cte_epsi = 200.0; // TODO
+    double mult_ref_v = 15.0; // TODO
     for (int t = 0; t < N; t++) {
       fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[cte_start + t], 2);
       fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t], 2);
@@ -70,7 +70,7 @@ public:
     }
     
     // Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
-    double mult_change_rate = 1.0; // TODO
+    double mult_change_rate = 15.0; // TODO
     for (int t = 0; t < N - 1; t++) {
       fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
       fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
@@ -78,7 +78,7 @@ public:
     
     // Minimize the value gap between sequential actuations.
     // The next control input should be similar to the current one.
-    double mult_gap_actions = 450.0; // TODO
+    double mult_gap_actions = 50.0; // TODO
     for (int t = 0; t < N - 2; t++) {
       fg[0] += mult_gap_actions* CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
       fg[0] += mult_gap_actions * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
