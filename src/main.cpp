@@ -98,9 +98,9 @@ int main() {
           double map_px = j[1]["x"];
           double map_py = j[1]["y"];
           double map_psi = j[1]["psi"];
-          double v = j[1]["speed"];
+          double v_miles = j[1]["speed"];
           // Convert from miles/h to m/s
-          //v = v * 0.44704;
+          double v_m = v_miles * 0.44704;
           double steering_angle = j[1]["steering_angle"];
           
           vector<double> car_ptsx;
@@ -123,9 +123,9 @@ int main() {
           
           // Predict state after latency -> TODO
           double dt = 0.1;
-          double car_px = v*dt;
+          double car_px = v_m*dt;
           const double Lf = 2.67;
-          double car_psi = -v*steering_angle*dt/Lf;
+          double car_psi = -v_m*steering_angle*dt/Lf;
           
           double cte = polyeval(coeffs, car_px);
           double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
@@ -133,7 +133,7 @@ int main() {
           std::cout << "Epsi: " << epsi << std::endl;
           
           Eigen::VectorXd state(6);
-          state << car_px, 0.0, car_psi, v, cte, epsi;
+          state << car_px, 0.0, car_psi, v_miles, cte, epsi;
           
           vector<size_t> idx = mpc.getIdx();
           auto vars = mpc.Solve(state, coeffs);
@@ -149,8 +149,8 @@ int main() {
           size_t a_start = idx[7];
           
           // Normalize steer_value to [-1, 1]
-          //double steer_value = -vars[delta_start] / deg2rad(25);
-          double steer_value = -vars[delta_start];
+          double steer_value = -vars[delta_start] / deg2rad(25);
+          
           double throttle_value = vars[a_start];
           
           std::cout << "Steering Value: " << steer_value << std::endl;
