@@ -27,6 +27,17 @@ The position of the vehicle is defined by (x,y). Psi stands for its orientation 
  
 The cross-track error (cte) is the difference between the path which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. Epsi is the orientation error of the vehicle. 
 
+### TODO
+- The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
+
+- The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
+
+- The trajectory is approximated with a 3rd order polynomial.
+
+- Out of the polynomial coefficients and the estimated position of the car (for details see ????) the cross-track error (CTE) and the orientation error (EPSI) are calculated.
+
+- N states with N-1 changes of the actuators are predicted within a prediction horizon T=N*dt (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+
 ### Timestep Length and Elapsed Duration (N & dt)
 
 ### Polynomial Fitting and MPC Preprocessing
