@@ -99,18 +99,19 @@ int main() {
           double map_py = j[1]["y"];
           double map_psi = j[1]["psi"];
           double v_miles = j[1]["speed"];
-          // Convert from miles/h to m/s
-          double v_m = v_miles * 0.44704;
           double steering_angle = j[1]["steering_angle"];
           
+          // Convert actual speed from miles/h to m/s
+          double v_m = v_miles * 0.44704;
+          
+          // Define vectors for car position in car's coordinate system
           vector<double> car_ptsx, car_ptsy;
           Eigen::VectorXd car_x, car_y;
           
           // Transform waypoints from map's coordinate system to car's coordinate system
           mpc.Transform_Map_to_Car(map_ptsx, map_ptsy, map_px, map_py, map_psi, car_ptsx, car_ptsy, car_x, car_y);
           
-          // // Fit a polynomial
-          // Third-degree polynomials are common since they can fit most roads.
+          // Fit a polynomial (third-degree polynomials are common since they can fit most roads)
           auto coeffs = polyfit(car_x, car_y, 3);
           
           // Handle system latency of 100ms
@@ -120,7 +121,7 @@ int main() {
           const double Lf = 2.67;
           double car_psi = -v_m*steering_angle*dt/Lf;
           
-          // Evaluate a polynomial
+          // Evaluate the polynomial at car position after latency of 100ms
           double cte = polyeval(coeffs, car_px);
           double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
           std::cout << "CTE: " << cte << std::endl;
@@ -172,8 +173,7 @@ int main() {
           msgJson["mpc_y"] = mpc_y_vals;
           
           
-          //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
-          // the points in the simulator are connected by a Yellow line
+          // Display the polynomial fitted reference path as a yellow line
           msgJson["next_x"] = car_ptsx;
           msgJson["next_y"] = car_ptsy;
           

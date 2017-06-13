@@ -13,6 +13,7 @@
 
 using CppAD::AD;
 
+// Define the prediction horizon T, which is calculated by N*dt
 size_t N = 10;
 double dt = 0.12;
 
@@ -28,8 +29,7 @@ double dt = 0.12;
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
 
-// NOTE: feel free to play around with this
-// or do something completely different
+// Define reference values for cte, epsi and speed (v)
 double ref_cte = 0;
 double ref_epsi = 0;
 double ref_v = 70.0;
@@ -59,10 +59,7 @@ public:
     fg[0] = 0;
     
     // Reference State Cost
-    // Define the cost related the reference state and
-    // any anything you think may be beneficial.
-    
-    // The part of the cost based on the reference state.
+    // The part of the cost based on the reference state (cte, epsi, v).
     double mult_ref_cte_epsi = 2200.0;
     double mult_ref_v = 1.0;
     for (int t = 0; t < N; t++) {
@@ -86,18 +83,11 @@ public:
       fg[0] += mult_gap_action_delta * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
       fg[0] += mult_gap_action_a * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
-    
-    // Minimize the value gap between sequential actuations.
-    
+  
     // Setup Constraints
-    //
-    // NOTE: In this section you'll setup the model constraints.
+    // 1 is added to each of the starting indices due to cost being located at `fg[0]`
     
     // Initial constraints
-    //
-    // We add 1 to each of the starting indices due to cost being located at
-    // index 0 of `fg`.
-    // This bumps up the position of all the other values.
     fg[1 + x_start] = vars[x_start];
     fg[1 + y_start] = vars[y_start];
     fg[1 + psi_start] = vars[psi_start];
@@ -107,6 +97,7 @@ public:
     
     // The rest of the constraints
     for (int t = 1; t < N; t++) {
+      // The state at time t+1
       AD<double> x1 = vars[x_start + t];
       AD<double> y1 = vars[y_start + t];
       AD<double> psi1 = vars[psi_start + t];
@@ -114,7 +105,7 @@ public:
       AD<double> cte1 = vars[cte_start + t];
       AD<double> epsi1 = vars[epsi_start + t];
       
-      // The state at time t.
+      // The state at time t
       AD<double> x0 = vars[x_start + t - 1];
       AD<double> y0 = vars[y_start + t - 1];
       AD<double> psi0 = vars[psi_start + t - 1];
@@ -122,7 +113,7 @@ public:
       AD<double> cte0 = vars[cte_start + t - 1];
       AD<double> epsi0 = vars[epsi_start + t - 1];
       
-      // Only consider the actuation at time t.
+      // Only consider the actuation at time t
       AD<double> delta0 = vars[delta_start + t - 1];
       AD<double> a0 = vars[a_start + t - 1];
       
@@ -157,9 +148,10 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   //
   // 4 * 10 + 2 * 9
   size_t n_vars = 6*N + 2*(N-1);
-  // TODO: Set the number of constraints
+  // Set the number of constraints
   size_t n_constraints = 6*N;
   
+  // Set the different values
   double x = state[0];
   double y = state[1];
   double psi = state[2];
@@ -192,13 +184,13 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     vars_upperbound[i] = std::numeric_limits<double>::max();
   }
   
-  // Set lower and upper limits for steering angle
+  // Set lower and upper limits for steering angle (25 degree -> radians)
   for (int i = delta_start; i < a_start; i++) {
     vars_lowerbound[i] = -0.436332;
     vars_upperbound[i] = 0.436332;
   }
   
-  // Set lower and upper limits for throttle
+  // Set lower and upper limits for throttle which is [-1, 1]
   for (int i = a_start; i < n_vars; i++) {
     vars_lowerbound[i] = -1.0;
     vars_upperbound[i] = 1.0;
@@ -262,13 +254,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   
   // Cost
   auto cost = solution.obj_value;
-  std::cout << "Cost " << cost << std::endl;
+  std::cout << "Cost: " << cost << std::endl;
   
-  // TODO: Return the first actuator values. The variables can be accessed with
-  // `solution.x[i]`.
-  //
-  // {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
-  // creates a 2 element double vector.
+  // Return the first actuator values. The variables can be accessed with `solution.x[i]`
   vector<double> solution_x;
   
   for (int i = 0; i < n_vars; i++) {
@@ -281,16 +269,20 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px,       double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy,
                                Eigen::VectorXd& car_x, Eigen::VectorXd& car_y) {
   
+  // Alert if there is a not matching size x/y
   assert(map_ptsx.size() == map_ptsy.size());
   
+  // Get vecotrs of the right size
   car_ptsx.resize(map_ptsx.size());
   car_ptsy.resize(map_ptsy.size());
   car_x.resize(map_ptsy.size());
   car_y.resize(map_ptsy.size());
   
+  // Precalculate cos/sin
   const double cos_psi = cos(map_psi);
   const double sin_psi = sin(map_psi);
   
+  // Set the vector's values
   for (int i = 0; i < car_ptsx.size(); i++) {
     const double map_x = map_ptsx[i] - map_px;
     const double map_y = map_ptsy[i] - map_py;
@@ -306,6 +298,6 @@ int MPC::getN() {
 }
 
 vector<size_t> MPC::getIdx() {
-  vector<size_t> idx = {x_start, y_start, psi_start, v_start, cte_start, epsi_start, delta_start, a_start };
+  vector<size_t> idx = {x_start, y_start, psi_start, v_start, cte_start, epsi_start, delta_start, a_start};
   return idx;
 }
