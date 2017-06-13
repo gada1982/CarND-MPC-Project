@@ -8,14 +8,16 @@ Through the implemented MPC, the vehicle follows the trajectory path provided by
 A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. 
 
 The kinematic model is implemented through the following equations:
-`x[t+1] = x[t] + v[t] * cos(psi[t]) * dt
- y[t+1] = y[t] + v[t] * sin(psi[t]) * dt
- psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
- v[t+1] = v[t] + a[t] * dt`
+
+`x[t+1] = x[t] + v[t] * cos(psi[t]) * dt`
+`y[t+1] = y[t] + v[t] * sin(psi[t]) * dt`
+`psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt`
+`v[t+1] = v[t] + a[t] * dt`
  
  The error (distance and orientation) is calculated with the following equations:
- `cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
-  epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
+ 
+ `cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt`
+ `epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
 
 
 ### Timestep Length and Elapsed Duration (N & dt)
