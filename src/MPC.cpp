@@ -30,6 +30,8 @@ const double Lf = 2.67;
 
 // NOTE: feel free to play around with this
 // or do something completely different
+double ref_cte = 0;
+double ref_epsi = 0;
 double ref_v = 70.0;
 
 // The solver takes all the state variables and actuator
@@ -61,16 +63,16 @@ public:
     // any anything you think may be beneficial.
     
     // The part of the cost based on the reference state.
-    double mult_ref_cte_epsi = 200.0; // TODO
-    double mult_ref_v = 15.0; // TODO
+    double mult_ref_cte_epsi = 2000.0;
+    double mult_ref_v = 1.0;
     for (int t = 0; t < N; t++) {
-      fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[cte_start + t], 2);
-      fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t], 2);
+      fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[cte_start + t] - ref_cte, 2);
+      fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t] - ref_epsi, 2);
       fg[0] += mult_ref_v * CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     
     // Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
-    double mult_change_rate = 15.0; // TODO
+    double mult_change_rate = 5.0;
     for (int t = 0; t < N - 1; t++) {
       fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
       fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
@@ -78,10 +80,11 @@ public:
     
     // Minimize the value gap between sequential actuations.
     // The next control input should be similar to the current one.
-    double mult_gap_actions = 50.0; // TODO
+    double mult_gap_action_delta = 200.0;
+    double mult_gap_action_a = 10.0;
     for (int t = 0; t < N - 2; t++) {
-      fg[0] += mult_gap_actions* CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      fg[0] += mult_gap_actions * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      fg[0] += mult_gap_action_delta * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += mult_gap_action_a * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
     
     // Minimize the value gap between sequential actuations.
