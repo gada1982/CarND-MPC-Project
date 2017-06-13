@@ -16,13 +16,16 @@ The kinematic model is implemented through the following equations:
 `psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt`
 
 `v[t+1] = v[t] + a[t] * dt`
+
+The position of the vehicle is defined by (x,y). Psi stands for its orientation and v for its velocity. delta and a represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by Lf.
  
  The error (distance and orientation) is calculated with the following equations:
  
  `cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt`
  
  `epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
-
+ 
+The cross-track error (cte) is the difference between the path which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. Epsi is the orientation error of the vehicle. 
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
