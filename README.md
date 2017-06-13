@@ -1,10 +1,11 @@
 # CarND-Controls-MPC
-This project is done as a part of the Nanodegree - Self-Driving Car Engineer provided by Udacity. The scope of this project is the implementation of Model Predictive Control (MPC), which allows a car (in a simulator) to follow the given track by adjusting the steering angle.
-
+This project is done as a part of the Nanodegree - Self-Driving Car Engineer provided by Udacity. The scope of this project is the implementation of Model Predictive Control (MPC), which allows a car (in a simulator) to follow the given track by adjusting the steering angle, throttle, and brake. A latency of 100ms between actuator commands is part of the system.
 
 ## Implementation
-
 ### The Model
+Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
+
+A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. The kinematic model is implemented through the following equations:
 
 
 ### Timestep Length and Elapsed Duration (N & dt)
