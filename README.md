@@ -3,6 +3,8 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+The following [video](https://youtu.be/7zCltY4EiUc) shows a car, controlled by the implemented MPC controller, successfully driving on a given track.
+
 ## Dependencies
 
 * cmake >= 3.5
