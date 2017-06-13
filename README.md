@@ -1,6 +1,6 @@
 # CarND-Controls-MPC
-
 This project is done as a part of the Nanodegree - Self-Driving Car Engineer provided by Udacity. The scope of this project is the implementation of Model Predictive Control (MPC), which allows a car (in a simulator) to follow the given track by adjusting the steering angle.
+
 ---
 
 ## Model Predictive Control (MPC)
