@@ -1,7 +1,7 @@
 /*
  * MPC.cpp
  *
- * Created on: June 09, 2017
+ * Created on: June 13, 2017
  * Author: Daniel Gattringer
  * Mail: daniel@gattringer.biz
  */
@@ -275,12 +275,15 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   return solution_x;
 }
 
-void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px, double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy) {
+void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px,       double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy,
+                               Eigen::VectorXd& car_x, Eigen::VectorXd& car_y) {
   
   assert(map_ptsx.size() == map_ptsy.size());
   
   car_ptsx.resize(map_ptsx.size());
   car_ptsy.resize(map_ptsy.size());
+  car_x.resize(map_ptsy.size());
+  car_y.resize(map_ptsy.size());
   
   const double cos_psi = cos(map_psi);
   const double sin_psi = sin(map_psi);
@@ -290,6 +293,8 @@ void MPC::Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<doub
     const double map_y = map_ptsy[i] - map_py;
     car_ptsx[i] = map_x*cos_psi + map_y*sin_psi;
     car_ptsy[i] = -map_x*sin_psi + map_y*cos_psi;
+    car_x[i] = car_ptsx[i];
+    car_y[i] = car_ptsy[i];
   }
 }
 

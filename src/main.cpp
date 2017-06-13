@@ -103,30 +103,24 @@ int main() {
           double v_m = v_miles * 0.44704;
           double steering_angle = j[1]["steering_angle"];
           
-          vector<double> car_ptsx;
-          vector<double> car_ptsy;
-          
-          mpc.Transform_Map_to_Car(map_ptsx, map_ptsy, map_px, map_py, map_psi, car_ptsx, car_ptsy);
-          
+          vector<double> car_ptsx, car_ptsy;
           Eigen::VectorXd car_x, car_y;
           
-          car_x.resize(car_ptsx.size());
-          car_y.resize(car_ptsy.size());
+          // Transform waypoints from map's coordinate system to car's coordinate system
+          mpc.Transform_Map_to_Car(map_ptsx, map_ptsy, map_px, map_py, map_psi, car_ptsx, car_ptsy, car_x, car_y);
           
-          for (size_t i = 0; i < car_ptsx.size(); i++) {
-            car_x[i] = car_ptsx[i];
-            car_y[i] = car_ptsy[i];
-          }
-          
-          // TODO: Third-degree polynomials are common since they can fit most roads.
+          // // Fit a polynomial
+          // Third-degree polynomials are common since they can fit most roads.
           auto coeffs = polyfit(car_x, car_y, 3);
           
-          // Predict state after latency -> TODO
+          // Handle system latency of 100ms
+          // Predict state after latency
           double dt = 0.1;
           double car_px = v_m*dt;
           const double Lf = 2.67;
           double car_psi = -v_m*steering_angle*dt/Lf;
           
+          // Evaluate a polynomial
           double cte = polyeval(coeffs, car_px);
           double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
           std::cout << "CTE: " << cte << std::endl;
@@ -135,10 +129,8 @@ int main() {
           Eigen::VectorXd state(6);
           state << car_px, 0.0, car_psi, v_miles, cte, epsi;
           
+          // Get start indexes for single parts of the vector
           vector<size_t> idx = mpc.getIdx();
-          auto vars = mpc.Solve(state, coeffs);
-          
-          // TODO Rework
           size_t x_start = idx[0];
           size_t y_start = idx[1];
           size_t psi_start = idx[2];
@@ -148,21 +140,24 @@ int main() {
           size_t delta_start = idx[6];
           size_t a_start = idx[7];
           
+          // Solve the model given an initial state and polynomial coefficients
+          auto vars = mpc.Solve(state, coeffs);
+          
           // Normalize steer_value to [-1, 1]
           double steer_value = -vars[delta_start] / deg2rad(25);
           
           double throttle_value = vars[a_start];
           
           std::cout << "Steering Value: " << steer_value << std::endl;
-          std::cout << "Throttle Value: " << throttle_value << std::endl<<std::endl;
+          std::cout << "Throttle Value: " << throttle_value << std::endl << std::endl;
           
           json msgJson;
-          // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
-          // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
+          
+          // Send the steering value back [-1, 1].
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle_value;
           
-          // Display the MPC predicted trajectory
+          // Display the MPC predicted trajectory path as a green line
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
           

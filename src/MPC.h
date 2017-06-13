@@ -1,7 +1,7 @@
 /*
  * MPC.h
  *
- * Created on: June 09, 2017
+ * Created on: June 13, 2017
  * Author: Daniel Gattringer
  * Mail: daniel@gattringer.biz
  */
@@ -25,7 +25,7 @@ public:
   vector<double> Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs);
   
   // Transform waypoints from map's coordinate system to car's coordinate system
-  void Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px, double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy);
+  void Transform_Map_to_Car(const vector<double>& map_ptsx, const vector<double>& map_ptsy, double map_px,       double map_py, double map_psi, vector<double>& car_ptsx, vector<double>& car_ptsy, Eigen::VectorXd& car_x, Eigen::VectorXd& car_y);
   
   // Return indexs for single values
   vector<size_t> getIdx();
