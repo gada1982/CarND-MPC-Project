@@ -10,13 +10,17 @@ A kinematic bicycle model is used as vehicle model. This model simplifies the re
 The kinematic model is implemented through the following equations:
 
 `x[t+1] = x[t] + v[t] * cos(psi[t]) * dt`
+
 `y[t+1] = y[t] + v[t] * sin(psi[t]) * dt`
+
 `psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt`
+
 `v[t+1] = v[t] + a[t] * dt`
  
  The error (distance and orientation) is calculated with the following equations:
  
  `cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt`
+ 
  `epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
 
 
