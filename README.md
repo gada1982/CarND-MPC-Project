@@ -34,7 +34,7 @@ The kinematic model is implemented through the following equations:
 
 `v[t+1] = v[t] + a[t] * dt`
 
-The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*.
+The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*. *Dt* is the time spane between the actual state and the following.
  
  The error (distance and orientation) is calculated with the following equations:
  
