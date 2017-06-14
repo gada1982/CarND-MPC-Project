@@ -96,8 +96,6 @@ for (int t = 0; t < N - 2; t++) {
   fg[0] += mult_gap_action_a * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
 }
 ```
-
-
 ## Timestep Length and Elapsed Duration (N & dt)
 The prediction horizon *(T)* is the duration over which future predictions are made.`T=N*dt` (N = number of timesteps in the horizon, dt = time between two actuations). Parameters are set be defining a suitable value for T first. This depands how fast the environment is changeing and how likely it is the future states can be predicted in a useful way. The higher N is the more computing power is necessary. Smaller values of dt result in higher frequent actuations, which makes it easier to accurately approximate a continuous reference trajectory.
 
@@ -112,6 +110,12 @@ Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been test
 ## Target Speed
 In order to test the quality of the control system, the target speed was gradually increased. The main requirement was that the vehicle has to master the route safely. 70 miles/h can be managed on a mid-class computing system. Because of the non-real-time behavior of the simulator and its connection to the control system, this can vary when using other systems. In a real automotive application, this task is managed by a strictly determinstic system to minimize timing effects.
 
+## Polynomial Fitting
+After transforming the waypoints into the car's coordinate system a polynom third-order is fitted to this points. A polynom of this kind is chosen because they can approximate most roads and are not too complex to process.
+```
+// Fit a polynomial 
+auto coeffs = polyfit(car_x, car_y, 3);
+```
 ## Model Predictive Control with Latency
 
 The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and result of using actuators have a time shift. This can be explained through processing time, signal runtime, and mechanical properties and other variables, and so the system won't react instantaneously.
