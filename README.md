@@ -92,6 +92,17 @@ for (int t = 0; t < N - 2; t++) {
 
 The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and result of using actuators have a time shift. This can be explained through processing time, signal runtime, and mechanical properties and other variables, and so the system won't react instantaneously.
 
+Latency is taken into account by setting the initial value of the state vector. This is done by taking the current state taken from the simulator and projected them forward one latency time step.
+
+```
+// Handle system latency of 100ms
+// Predict state after latency
+double dt = 0.1;
+double car_px = v_m*dt;
+const double Lf = 2.67;
+double car_psi = -v_m*steering_angle*dt/Lf;
+```
+
 ### Unit Conversion
 The simulator gives the actual speed in *miles/h*, but distance is measured in *m* and time spans are measured in *s*. This has to be considered by:
 ```
