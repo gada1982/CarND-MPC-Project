@@ -95,7 +95,8 @@ double dt = 0.12;
 ```
 Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been tested in various combinations.
 
-### Polynomial Fitting and MPC Preprocessing
+### Target Speed
+In order to test the quality of the control system, the target speed was gradually increased. The main requirement was that the vehicle has to master the route safely. 70 miles/h can be managed on a mid-class computing system. Because of the non-real-time behavior of the simulator and its connection to the control system, this can vary when using other systems. In a real automotive application, this task is managed by a strictly determinstic system to minimize timing effects.
 
 ### Model Predictive Control with Latency
 
