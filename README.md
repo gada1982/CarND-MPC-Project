@@ -21,6 +21,25 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 
 ## Defining the Model
 
+### Vehicle State
+The actual state of the vehicle is defined by:
+- **Position of the car:** car_px, car_py
+- **Orientation of the car:** car_psi
+- **Speed:** v_miles
+
+For solving the optimization problem error values (distance and orientation) are necessary. The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
+
+These parameters are used the following way:
+```
+Eigen::VectorXd state(6);
+state << car_px, car_py, car_psi, v_miles, cte, epsi;
+
+// Solve the model given the vehicle's state and polynomial coefficients
+auto vars = mpc.Solve(state, coeffs);
+```
+### Vehicle's Actuators
+The system tries to reach the target state by setting values for the actuators. The orientation can be influenced by the steering angle *(delta)* and the speed by the acceleration *(a)*.
+
 ### Kinematic Model
 
 Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
@@ -28,7 +47,6 @@ Through the implemented MPC, the vehicle follows the reference path, provided by
 A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. 
 
 The kinematic model is implemented through the following equations:
-
 ```
 x[t+1] = x[t] + v[t] * cos(psi[t]) * dt
 y[t+1] = y[t] + v[t] * sin(psi[t]) * dt
@@ -40,15 +58,11 @@ The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientat
  
  ### Error
  
- The error (distance and orientation) is calculated with the following equations:
- 
+ The error (distance and orientation) is calculated with the following equations: 
  ```
  cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
  epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
  ```
- 
-The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
-
 ### Cost
 
 The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0. The model can be tuned by adapting the multiplication factors of the single parameters. The higher the single parts are the more important the parameter is for the final cost optimization.
