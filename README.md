@@ -7,7 +7,18 @@ When a human is driving he or she tries to stay within the preferred lane, keeps
 
 A car, which is using a Model Predictive Control, can imitate this behavior of taking future into account. By predicting different paths and choosing the best one, it can adapt it's driving behavior to different unknown situations. The behavior can be specified by choosing a car-specific cost-function, which defines constraints like how smooth the car should move or how far it is allowed to go off the planned path.
 
-## Implementation
+## Overview - Processing Steps
+- Get Waypoints 
+ - The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
+
+- The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
+
+- The trajectory is approximated with a 3rd order polynomial.
+
+- Out of the polynomial coefficients and the estimated position of the car (for details see ????) the cross-track error (CTE) and the orientation error (EPSI) are calculated.
+
+- N states with N-1 changes of the actuators are predicted within a prediction horizon T=N*dt (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+
 ### The Model
 Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
 
