@@ -8,16 +8,14 @@ When a human is driving he or she tries to stay within the preferred lane, keeps
 A car, which is using a Model Predictive Control, can imitate this behavior of taking future into account. By predicting different paths and choosing the best one, it can adapt it's driving behavior to different unknown situations. The behavior can be specified by choosing a car-specific cost-function, which defines constraints like how smooth the car should move or how far it is allowed to go off the planned path.
 
 ## Overview - Processing Steps
-- Get Waypoints
- - The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
-
-- The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
-
-- The trajectory is approximated with a 3rd order polynomial.
-
-- Out of the polynomial coefficients and the estimated position of the car (for details see ????) the cross-track error (CTE) and the orientation error (EPSI) are calculated.
-
-- N states with N-1 changes of the actuators are predicted within a prediction horizon T=N*dt (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+- **Get Waypoints:** The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
+- **Get Actual Vehicle Data:** The MPC gets actual vehicle data like the position and the orientation of the car or the acutal speed and steering angle from the simlulator.
+- **Transform Coordinate System:** The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
+- **Fit a Polynom:** The trajectory is approximated with a 3rd order polynomial.
+- **System Latency:** The whole system has a latency of 100ms, which has to be taken into account.
+- **Calculate Error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
+- **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon 'T=N*dt' (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+- **Control Car:** The first prediction is taken to control the cars steering and accelartion (throttle/brake).
 
 ### The Model
 Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
