@@ -51,6 +51,37 @@ The cross-track error *(cte)* is the difference between the path, which the car 
 
 **Cost**
 
+The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0.
+
+The cost-model is defined as follows:
+
+```
+// Reference State Cost
+// The part of the cost based on the reference state (cte, epsi, v).
+double mult_ref_cte_epsi = 2200.0;
+double mult_ref_v = 1.0;
+for (int t = 0; t < N; t++) {
+  fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[cte_start + t] - ref_cte, 2);
+  fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t] - ref_epsi, 2);
+  fg[0] += mult_ref_v * CppAD::pow(vars[v_start + t] - ref_v, 2);
+}
+    
+// Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
+double mult_change_rate = 10.0;
+for (int t = 0; t < N - 1; t++) {
+  fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
+  fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
+}
+    
+// Minimize the value gap between sequential actuations.
+// The next control input should be similar to the current one.
+double mult_gap_action_delta = 300.0;
+double mult_gap_action_a = 20.0;
+for (int t = 0; t < N - 2; t++) {
+  fg[0] += mult_gap_action_delta * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+  fg[0] += mult_gap_action_a * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+}
+```
 
 
 ### Timestep Length and Elapsed Duration (N & dt)
