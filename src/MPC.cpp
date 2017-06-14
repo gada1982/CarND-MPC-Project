@@ -68,15 +68,17 @@ public:
       fg[0] += mult_ref_v * CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
     
-    // Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
+    // Minimize the usage of the actuators (steering, throttle/brake)
+    // to prevent too hard steering and acceleration after strong changes in the vehicle's state
+    // (e.g.: cte / epsi high because of the need to change lane.)
     double mult_change_rate = 10.0;
     for (int t = 0; t < N - 1; t++) {
       fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
       fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
     }
     
-    // Minimize the value gap between sequential actuations.
-    // The next control input should be similar to the current one.
+    // Minimize the difference between the next actuator state and the current one
+    // The next control input should be similar to the current one to avoid erratic driving.
     double mult_gap_action_delta = 300.0;
     double mult_gap_action_a = 20.0;
     for (int t = 0; t < N - 2; t++) {
