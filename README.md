@@ -8,28 +8,29 @@ When a human is driving he or she tries to stay within the preferred lane, keeps
 A car, which is using a Model Predictive Control, can imitate this behavior of taking future into account. By predicting different paths and choosing the best one, it can adapt it's driving behavior to different unknown situations. The behavior can be specified by choosing a car-specific cost-function, which defines constraints like how smooth the car should move or how far it is allowed to go off the planned path.
 
 ## Overview - Processing Steps
-- **Get Waypoints:** The MPC gets the referance path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
-- **Get Actual Vehicle Data:** The MPC gets actual vehicle data like the position and the orientation of the car or the actual speed and steering angle from the simlulator.
-- **Transform Coordinate System:** In the map coordinate system x is positive to the right and y is positive up (like in a standard graph). In car cordinate system x is positive in straight driving direction and y is positive 90 degree to the left.The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
-- **Fit a Polynom:** The trajectory is approximated with a 3rd order polynomial.
-- **System Latency:** The whole system has a latency of 100ms, which has to be taken into account.
-- **Calculate Error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
+- **Get waypoints:** The MPC gets the referance path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
+- **Get actual vehicle data:** The MPC gets actual vehicle data like the position and the orientation of the car or the actual speed and steering angle from the simlulator.
+- **Transform coordinate system:** In the map coordinate system x is positive to the right and y is positive up (like in a standard graph). In car coordinate system x is positive in straight driving direction and y is positive 90 degree to the left. The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
+- **Fit a polynom:** The trajectory is approximated with a 3rd order polynomial.
+- **System latency:** The whole system has a latency of 100ms, which has to be taken into account.
+- **Calculate error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
 - **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon `T=N*dt` (N = number of timesteps, dt = time between two actuations). The states are in the vehicle's coordinate system.
-- **Control Car:** The first prediction is taken to control the cars steering and accelartion (throttle/brake).
-- **Visualize:** Display the MPC trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
+- **Control car:** The first prediction is taken to control the cars steering and acceleration (throttle/brake).
+- **Visualize:** Display the predicted trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
 - **Repeat all steps**
 
 ## Defining the Model
+Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
 
 ### Vehicle State
 The actual state of the vehicle is defined by:
 - **Position of the car:** car_px, car_py
 - **Orientation of the car:** car_psi
-- **Speed:** v_miles
+- **Actual speed:** v_miles
 
-For solving the optimization problem error values (distance and orientation) are necessary. The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
+For solving the optimization problem error values (distance and orientation) are needed. The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
 
-These parameters are used the following way:
+These parameters are used the following way to solve the optimization problem:
 ```
 Eigen::VectorXd state(6);
 state << car_px, car_py, car_psi, v_miles, cte, epsi;
@@ -39,12 +40,13 @@ auto vars = mpc.Solve(state, coeffs);
 ```
 ### Vehicle's Actuators
 The system tries to reach the target state by setting values for the actuators. The orientation can be influenced by the steering angle *(delta)* and the speed by the acceleration *(a)*.
-
+```
+// Normalize steer_value to [-1, 1]
+double steer_value = -vars[delta_start] / deg2rad(25);
+double throttle_value = vars[a_start];
+```
 ### Kinematic Model
-
-Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
-
-A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. 
+A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the real vehicle dynamics. 
 
 The kinematic model is implemented through the following equations:
 ```
@@ -54,17 +56,15 @@ psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
 v[t+1] = v[t] + a[t] * dt
 ```
 
-The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*. *Dt* is the time spane between the actual state and the following.
+The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (for steering and acceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*. *dt* is the time span between the actual state and the following.
  
  ### Error
- 
  The error (distance and orientation) is calculated with the following equations: 
  ```
  cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
  epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
  ```
 ### Cost
-
 The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0. The model can be tuned by adapting the multiplication factors of the single parameters. The higher the single parts are the more important the parameter is for the final cost optimization.
 
 The cost-model is defined as follows:
@@ -97,9 +97,9 @@ for (int t = 0; t < N - 2; t++) {
 }
 ```
 ## Timestep Length and Elapsed Duration (N & dt)
-The prediction horizon *(T)* is the duration over which future predictions are made.`T=N*dt` (N = number of timesteps in the horizon, dt = time between two actuations). Parameters are set be defining a suitable value for T first. This depands how fast the environment is changeing and how likely it is the future states can be predicted in a useful way. The higher N is the more computing power is necessary. Smaller values of dt result in higher frequent actuations, which makes it easier to accurately approximate a continuous reference trajectory.
+The prediction horizon *(T)* is the duration over which future predictions are made.`T=N*dt` (N = number of timesteps in the horizon, dt = time between two actuations). Parameters are set be defining a suitable value for T first. This depends how fast the environment is changing and how likely it is the future states can be predicted in a useful way. The higher N is the more computing power is necessary. Smaller values of dt result in higher frequent actuations, which makes it easier to accurately approximate a continuous reference trajectory.
 
-The values have been set to the following values after lots of experiementation:
+The values have been set to the following numbers after lots of experiementation:
 ```
 // Define the prediction horizon T, which is calculated by N*dt
 size_t N = 10;
@@ -108,20 +108,18 @@ double dt = 0.12;
 Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been tested in various combinations.
 
 ## Target Speed
-In order to test the quality of the control system, the target speed was gradually increased. The main requirement was that the vehicle has to master the route safely. 70 miles/h can be managed on a mid-class computing system. Because of the non-real-time behavior of the simulator and its connection to the control system, this can vary when using other systems. In a real automotive application, this task is managed by a strictly determinstic system to minimize timing effects.
+In order to test the quality of the control system, the target speed was gradually increased. The main requirement was that the vehicle has to master the route safely. 70 miles/h can be managed on a mid-class computing system. Because of the non-real-time behavior of the simulator and its connection to the control system, this can vary when using other systems. In a real automotive application, this task is managed by a strictly deterministic system to minimize timing effects.
 
 ## Polynomial Fitting
-After transforming the waypoints into the car's coordinate system a polynom third-order is fitted to this points. A polynom of this kind is chosen because they can approximate most roads and are not too complex to process.
+After transforming the waypoints into the car's coordinate system a polynomial third-order is fitted to this points. A polynomial of this kind is chosen because they can approximate most roads and are not too complex to process.
 ```
 // Fit a polynomial 
 auto coeffs = polyfit(car_x, car_y, 3);
 ```
 ## Model Predictive Control with Latency
-
-The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and result of using actuators have a time shift. This can be explained through processing time, signal runtime, and mechanical properties and other variables, and so the system won't react instantaneously.
+The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and the result of using actuators have a time shift. This can be explained through processing time, signal runtime, mechanical properties and other variables, and so the system won't react instantaneously.
 
 Latency is taken into account by setting the initial value of the state vector. This is done by taking the current state taken from the simulator and projected them forward one latency time step.
-
 ```
 // Handle system latency of 100ms
 // Predict state after latency
@@ -143,7 +141,6 @@ The systems steering is between *[-25/25] degree*, which is *[-0.436332/-0.43633
 double steer_value = -vars[delta_start] / deg2rad(25);
 ```
 ## Simulation
-
 The following [video](https://youtu.be/7zCltY4EiUc) shows a car, controlled by the implemented MPC controller, successfully driving on a given track.
 
 ## Reflection
