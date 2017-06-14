@@ -14,7 +14,7 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Fit a Polynom:** The trajectory is approximated with a 3rd order polynomial.
 - **System Latency:** The whole system has a latency of 100ms, which has to be taken into account.
 - **Calculate Error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
-- **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon `T=N*dt` (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+- **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon `T=N*dt` (N = number of timesteps, dt = time between two actuations). The states are in the vehicle's coordinate system.
 - **Control Car:** The first prediction is taken to control the cars steering and accelartion (throttle/brake).
 - **Visualize:** Display the MPC trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
 - **Repeat all steps**
@@ -85,6 +85,15 @@ for (int t = 0; t < N - 2; t++) {
 
 
 ### Timestep Length and Elapsed Duration (N & dt)
+The prediction horizon *(T)* is the duration over which future predictions are made.`T=N*dt` (N = number of timesteps in the horizon, dt = time between two actuations). Parameters are set be defining a suitable value for T first. This depands how fast the environment is changeing and how likely it is the future states can be predicted in a useful way. The higher N is the more computing power is necessary. Smaller values of dt result in higher frequent actuations, which makes it easier to accurately approximate a continuous reference trajectory.
+
+The values have been set to the following values after lots of experiementation:
+```
+// Define the prediction horizon T, which is calculated by N*dt
+size_t N = 10;
+double dt = 0.12;
+```
+Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been testing in various combinations.
 
 ### Polynomial Fitting and MPC Preprocessing
 
