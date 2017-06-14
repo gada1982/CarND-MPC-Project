@@ -80,7 +80,7 @@ for (int t = 0; t < N; t++) {
 
 // Minimize the usage of the actuators (steering, throttle/brake)
 // to prevent too hard steering and acceleration after strong changes in the vehicle's state
-// (e.g.: cte / epsi high because of the need to change lane.
+// (e.g.: cte / epsi high because of the need to change lane.)
 double mult_change_rate = 10.0;
 for (int t = 0; t < N - 1; t++) {
   fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
