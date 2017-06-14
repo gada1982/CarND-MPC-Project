@@ -3,6 +3,10 @@ This project is done as a part of the Nanodegree - Self-Driving Car Engineer pro
 
 ![image_screen](https://github.com/gada1982/CarND-MPC-Project/blob/master/info_for_readme/Screenshot_jpg.jpg)
 
+When a human is driving he or she tries to stay within the preferred lane, keeps the desired speed, and turns as smooth as possible. To get this job done we look ahead. As an example, the driver will slow down before driving into a sharp turn and will accelerate after reaching the middle of the curve. 
+
+A car, which is using a Model Predictive Control, can imitate this behavior of taking future into account. By predicting different paths and choosing the best one, it can adapt it's driving behavior to different unknown situations. The behavior can be specified by choosing a car-specific cost-function, which defines constraints like how smooth the car should move or how far it is allowed to go off the planned path.
+
 ## Implementation
 ### The Model
 Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
