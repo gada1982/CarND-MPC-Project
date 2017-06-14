@@ -93,7 +93,7 @@ The values have been set to the following values after lots of experiementation:
 size_t N = 10;
 double dt = 0.12;
 ```
-Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been testing in various combinations.
+Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been tested in various combinations.
 
 ### Polynomial Fitting and MPC Preprocessing
 
