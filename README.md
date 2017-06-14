@@ -11,7 +11,7 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Get waypoints:** The MPC gets the referance path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
 - **Get actual vehicle data:** The MPC gets actual vehicle data like the position and the orientation of the car or the actual speed and steering angle from the simlulator.
 - **Transform coordinate system:** In the map coordinate system x is positive to the right and y is positive up (like in a standard graph). In car coordinate system x is positive in straight driving direction and y is positive 90 degree to the left. The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
-- **Fit a polynom:** The trajectory is approximated with a 3rd order polynomial.
+- **Fitting a polynomial:** The trajectory is approximated with a 3rd order polynomial.
 - **System latency:** The whole system has a latency of 100ms, which has to be taken into account.
 - **Calculate error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
 - **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon `T=N*dt` (N = number of timesteps, dt = time between two actuations). The states are in the vehicle's coordinate system.
