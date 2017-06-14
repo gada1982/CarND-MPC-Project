@@ -68,9 +68,7 @@ The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientat
 The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0. The model can be tuned by adapting the multiplication factors of the single parameters. The higher the single parts are the more important the parameter is for the final cost optimization.
 
 The cost-model is defined as follows:
-
 ```
-// Reference State Cost
 // The part of the cost based on the reference state (cte, epsi, v).
 double mult_ref_cte_epsi = 2200.0;
 double mult_ref_v = 1.0;
@@ -79,16 +77,18 @@ for (int t = 0; t < N; t++) {
   fg[0] += mult_ref_cte_epsi * CppAD::pow(vars[epsi_start + t] - ref_epsi, 2);
   fg[0] += mult_ref_v * CppAD::pow(vars[v_start + t] - ref_v, 2);
 }
-    
-// Minimize the change-rate of using the actuators (steering, throttle/brake) to get a smoother driving
+
+// Minimize the usage of the actuators (steering, throttle/brake)
+// to prevent too hard steering and acceleration after strong changes in the vehicle's state
+// (e.g.: cte / epsi high because of the need to change lane.
 double mult_change_rate = 10.0;
 for (int t = 0; t < N - 1; t++) {
   fg[0] += mult_change_rate * CppAD::pow(vars[delta_start + t], 2);
   fg[0] += mult_change_rate * CppAD::pow(vars[a_start + t], 2);
 }
-    
-// Minimize the value gap between sequential actuations.
-// The next control input should be similar to the current one.
+
+// Minimize the difference between the next actuator state and the current one
+// The next control input should be similar to the current one to avoid erratic driving.
 double mult_gap_action_delta = 300.0;
 double mult_gap_action_a = 20.0;
 for (int t = 0; t < N - 2; t++) {
