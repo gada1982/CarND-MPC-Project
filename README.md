@@ -144,7 +144,7 @@ double steer_value = -vars[delta_start] / deg2rad(25);
 The following [video](https://youtu.be/7zCltY4EiUc) shows a car, controlled by the implemented MPC controller, successfully driving on a given track.
 
 ## Reflection
-The project was very interesting and challenging but the result was convincing. The advances through the use of MPC against PID control are immense. In contrast to the PID control, which always requires a compromise in tuning and more or less strongly oscillates around the target value, MPC works much better on both straights and curves.
+The project was very interesting and challenging but the result was convincing. The advances through the usage of MPC against PID control are immense. In contrast to the PID control, which always requires a compromise in tuning and more or less strongly oscillates around the target value, MPC works much better on both straights and curves.
 
 Future work will be invested to improve parameter settings and manage to drive with higher speed.
 
