@@ -14,8 +14,10 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Fit a Polynom:** The trajectory is approximated with a 3rd order polynomial.
 - **System Latency:** The whole system has a latency of 100ms, which has to be taken into account.
 - **Calculate Error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
-- **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon 'T=N*dt' (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+- **Predict future states:** N states with N-1 changes of the actuators are predicted within a prediction horizon `T=N*dt` (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
 - **Control Car:** The first prediction is taken to control the cars steering and accelartion (throttle/brake).
+- **Visualize:** Display the MPC trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
+- **Repeat all steps**
 
 ### The Model
 Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
