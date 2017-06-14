@@ -1,7 +1,7 @@
 # CarND-Controls-MPC
 This project is done as a part of the Nanodegree - Self-Driving Car Engineer provided by Udacity. The scope of this project is the implementation of Model Predictive Control (MPC), which allows a car (in a simulator) to follow the given track by adjusting the steering angle, throttle, and brake. A latency of 100ms between actuator commands is part of the system.
 
-[!image_screen](https://github.com/gada1982/CarND-MPC-Project/blob/master/info_for_readme/Screenshot_jpg.jpg)
+![image_screen](https://github.com/gada1982/CarND-MPC-Project/blob/master/info_for_readme/Screenshot_jpg.jpg)
 
 ## Implementation
 ### The Model
