@@ -19,30 +19,39 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Visualize:** Display the MPC trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
 - **Repeat all steps**
 
-### The Model
+### Defining the Model
+
+**Kinematic Model**
+
 Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
 
 A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. 
 
 The kinematic model is implemented through the following equations:
 
-`x[t+1] = x[t] + v[t] * cos(psi[t]) * dt`
-
-`y[t+1] = y[t] + v[t] * sin(psi[t]) * dt`
-
-`psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt`
-
-`v[t+1] = v[t] + a[t] * dt`
+```
+x[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+y[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+psi[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+v[t+1] = v[t] + a[t] * dt
+```
 
 The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*. *Dt* is the time spane between the actual state and the following.
  
+ **Error**
+ 
  The error (distance and orientation) is calculated with the following equations:
  
- `cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt`
- 
- `epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
+ ```
+ cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+ epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+ ```
  
 The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
+
+**Cost**
+
+
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
