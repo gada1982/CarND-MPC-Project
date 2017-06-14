@@ -97,10 +97,10 @@ Latency is taken into account by setting the initial value of the state vector. 
 ```
 // Handle system latency of 100ms
 // Predict state after latency
-double dt = 0.1;
-double car_px = v_m*dt;
+double dt_lat = 0.1;
+double car_px = v_m*dt_lat;
 const double Lf = 2.67;
-double car_psi = -v_m*steering_angle*dt/Lf;
+double car_psi = -v_m*steering_angle*dt_lat/Lf;
 ```
 
 ### Unit Conversion
