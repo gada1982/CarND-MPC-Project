@@ -51,7 +51,7 @@ The cross-track error *(cte)* is the difference between the path, which the car 
 
 **Cost**
 
-The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0.
+The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0. The model can be tuned by adapting the multiplication factors of the single parameters. The higher the single parts are the more important the parameter is for the final cost optimization.
 
 The cost-model is defined as follows:
 
