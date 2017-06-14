@@ -19,9 +19,9 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Visualize:** Display the MPC trajectory path (where the car will be) in green, and the reference path (where the car should be) in yellow.
 - **Repeat all steps**
 
-### Defining the Model
+## Defining the Model
 
-**Kinematic Model**
+### Kinematic Model
 
 Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
 
@@ -38,7 +38,7 @@ v[t+1] = v[t] + a[t] * dt
 
 The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*. *Dt* is the time spane between the actual state and the following.
  
- **Error**
+ ### Error
  
  The error (distance and orientation) is calculated with the following equations:
  
@@ -49,7 +49,7 @@ The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientat
  
 The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
 
-**Cost**
+### Cost
 
 The MPC includes a cost-model that defines the dynamics of the system and determines how much parameters are taken into account. Finally the MPC optimizes by choosing the best fitting prediction to get cost down to 0. The model can be tuned by adapting the multiplication factors of the single parameters. The higher the single parts are the more important the parameter is for the final cost optimization.
 
@@ -84,7 +84,7 @@ for (int t = 0; t < N - 2; t++) {
 ```
 
 
-### Timestep Length and Elapsed Duration (N & dt)
+## Timestep Length and Elapsed Duration (N & dt)
 The prediction horizon *(T)* is the duration over which future predictions are made.`T=N*dt` (N = number of timesteps in the horizon, dt = time between two actuations). Parameters are set be defining a suitable value for T first. This depands how fast the environment is changeing and how likely it is the future states can be predicted in a useful way. The higher N is the more computing power is necessary. Smaller values of dt result in higher frequent actuations, which makes it easier to accurately approximate a continuous reference trajectory.
 
 The values have been set to the following values after lots of experiementation:
@@ -95,10 +95,10 @@ double dt = 0.12;
 ```
 Values for *N* between *5 - 20* and for *dt* between *0.05 - 0.2* have been tested in various combinations.
 
-### Target Speed
+## Target Speed
 In order to test the quality of the control system, the target speed was gradually increased. The main requirement was that the vehicle has to master the route safely. 70 miles/h can be managed on a mid-class computing system. Because of the non-real-time behavior of the simulator and its connection to the control system, this can vary when using other systems. In a real automotive application, this task is managed by a strictly determinstic system to minimize timing effects.
 
-### Model Predictive Control with Latency
+## Model Predictive Control with Latency
 
 The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and result of using actuators have a time shift. This can be explained through processing time, signal runtime, and mechanical properties and other variables, and so the system won't react instantaneously.
 
@@ -112,8 +112,7 @@ double car_px = v_m*dt_lat;
 const double Lf = 2.67;
 double car_psi = -v_m*steering_angle*dt_lat/Lf;
 ```
-
-### Unit Conversion
+## Unit Conversion
 The simulator gives the actual speed in *miles/h*, but distance is measured in *m* and time spans are measured in *s*. This has to be considered by:
 ```
 // Convert actual speed from miles/h to m/s
@@ -121,15 +120,18 @@ double v_m = v_miles * 0.44704;
 ```
 
 The systems steering is between *[-25/25] degree*, which is *[-0.436332/-0.436332] radians* but the signal, which has to be sent to the simulator is a procentual value between *[-1/1]*. This has to be considered by:
-
 ```
 // Normalize steer_value to [-1, 1]
 double steer_value = -vars[delta_start] / deg2rad(25);
 ```
-
 ## Simulation
 
 The following [video](https://youtu.be/7zCltY4EiUc) shows a car, controlled by the implemented MPC controller, successfully driving on a given track.
+
+## Reflection
+The project was very interesting and challenging but the result was convincing. The advances through the use of MPC against PID control are immense. In contrast to the PID control, which always requires a compromise in tuning and more or less strongly oscillates around the target value, MPC works much better on both straights and curves.
+
+Future work will be invested to improve parameter settings and manage to drive with higher speed.
 
 ---
 ## Dependencies
