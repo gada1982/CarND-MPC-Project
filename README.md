@@ -20,7 +20,7 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 - **Repeat all steps**
 
 ### The Model
-Through the implemented MPC, the vehicle follows the trajectory path provided by a simulator in the map coordinate system by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
+Through the implemented MPC, the vehicle follows the reference path, provided by a simulator in the map coordinate system, by calculating and setting predicted actuator outputs for steering and acceleration (throttle/brake).
 
 A kinematic bicycle model is used as vehicle model. This model simplifies the real world by ignoring tire forces, gravity, and mass. This reduces the accuracy of the model but makes it more tractable. For low and moderate speeds, this type of kinematic models delivers a useful approximation of the actual vehicle dynamics. 
 
@@ -34,7 +34,7 @@ The kinematic model is implemented through the following equations:
 
 `v[t+1] = v[t] + a[t] * dt`
 
-The position of the vehicle is defined by (x,y). Psi stands for its orientation and v for its velocity. delta and a represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by Lf.
+The position of the vehicle is defined by *(x,y)*. *Psi* stands for its orientation and *v* for its velocity. *Delta* and *a* represent actuators (e.g.: for steering and aceleration - throttle/brake). The distance between the front of the vehicle and its center of gravity (CoG) is defined by *Lf*.
  
  The error (distance and orientation) is calculated with the following equations:
  
@@ -42,18 +42,7 @@ The position of the vehicle is defined by (x,y). Psi stands for its orientation 
  
  `epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt`
  
-The cross-track error (cte) is the difference between the path which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. Epsi is the orientation error of the vehicle. 
-
-### TODO
-- The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
-
-- The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
-
-- The trajectory is approximated with a 3rd order polynomial.
-
-- Out of the polynomial coefficients and the estimated position of the car (for details see ????) the cross-track error (CTE) and the orientation error (EPSI) are calculated.
-
-- N states with N-1 changes of the actuators are predicted within a prediction horizon T=N*dt (N = number of timesteps, dt = time between two actuation). The states are in the vehicle's coordinate system.
+The cross-track error *(cte)* is the difference between the path, which the car should follow and the current vehicle position. This is coupled with the y-coordinate in the coordinate system of the vehicle. *Epsi* is the orientation error of the vehicle. 
 
 ### Timestep Length and Elapsed Duration (N & dt)
 
