@@ -10,7 +10,7 @@ A car, which is using a Model Predictive Control, can imitate this behavior of t
 ## Overview - Processing Steps
 - **Get Waypoints:** The MPC gets the trajectory path from the simulator as an array of waypoints (ptsx/ptsy), which are in map coordinate system. 
 - **Get Actual Vehicle Data:** The MPC gets actual vehicle data like the position and the orientation of the car or the acutal speed and steering angle from the simlulator.
-- **Transform Coordinate System:** The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
+- **Transform Coordinate System:** In the map coordinate system x is positive to the right and y is positive up (like in a standard graph). In car cordinate system x is positive in straight driving direction and y is positive 90 degree to the left.The waypoints have to be transformed to the vehicle's coordinate system, because the cross-track error (CTE) and the orientation error (EPSI) have to be calculated in this reference space. 
 - **Fit a Polynom:** The trajectory is approximated with a 3rd order polynomial.
 - **System Latency:** The whole system has a latency of 100ms, which has to be taken into account.
 - **Calculate Error:** Out of the polynomial coefficients and the estimated position of the car, after the latency, the cross-track error (CTE) and the orientation error (EPSI) are calculated.
