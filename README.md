@@ -90,6 +90,21 @@ for (int t = 0; t < N - 2; t++) {
 
 ### Model Predictive Control with Latency
 
+The system operates with a latency of 100ms. This is introduced to get a more realistic simulation of real-world driving, where inputs of sensors and result of using actuators have a time shift. This can be explained through processing time, signal runtime, and mechanical properties and other variables, and so the system won't react instantaneously.
+
+### Unit Conversion
+The simulator gives the actual speed in *miles/h*, but distance is measured in *m* and time spans are measured in *s*. This has to be considered by:
+```
+// Convert actual speed from miles/h to m/s
+double v_m = v_miles * 0.44704;
+```
+
+The systems steering is between *[-25/25] degree*, which is *[-0.436332/-0.436332] radians* but the signal, which has to be sent to the simulator is a procentual value between *[-1/1]*. This has to be considered by:
+
+```
+// Normalize steer_value to [-1, 1]
+double steer_value = -vars[delta_start] / deg2rad(25);
+```
 
 ## Simulation
 
