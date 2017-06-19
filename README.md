@@ -141,7 +141,7 @@ The systems steering is between *[-25/25] degree*, which is *[-0.436332/-0.43633
 double steer_value = -vars[delta_start] / deg2rad(25);
 ```
 ## Simulation
-The following [video](https://youtu.be/7zCltY4EiUc) shows a car, controlled by the implemented MPC controller, successfully driving on a given track.
+The following [video](https://youtu.be/ozLKdjQXu7Q) shows a car, controlled by the implemented MPC controller, successfully driving on a given track with max. speed of 70 miles/h. The other [video](https://youtu.be/D0RX-5Z9zP4) shows a car, which uses the same MPC controller, at a higher reference speed of more than 100 miles/h.
 
 ## Reflection
 The project was very interesting and challenging but the result was convincing. The advances through the usage of MPC against PID control are immense. In contrast to the PID control, which always requires a compromise in tuning and more or less strongly oscillates around the target value, MPC works much better on both straights and curves.
