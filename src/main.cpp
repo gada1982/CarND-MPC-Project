@@ -118,12 +118,12 @@ int main() {
           // Predict state after latency
           double dt_lat = 0.1;
           double car_px = v_m*dt_lat;
-          const double Lf = 2.67;
+          double Lf = 2.67;
           double car_psi = -v_m*steering_angle*dt_lat/Lf;
           
           // Evaluate the polynomial at car position after latency of 100ms
           double cte = polyeval(coeffs, car_px);
-          double epsi = -atan(coeffs[1] + 2*car_px*coeffs[2] + 3*pow(car_px, 2)*coeffs[3]);
+          double epsi = -atan(coeffs[1]) + car_psi;
           std::cout << "CTE: " << cte << std::endl;
           std::cout << "Epsi: " << epsi << std::endl;
           
